@@ -1,10 +1,9 @@
-import './App.css'
-
+import Header from "./Header"
 function App() {
 
   return (
     <>
-      <p>Hello World</p>
+      <Header />
 
     </>
   )

@@ -1,0 +1,12 @@
+header {
+  width: 100%;
+  background-color: rgb(41, 128, 145);
+  display: flex;
+  justify-content: center;
+  color: aliceblue;
+}
+
+body {
+  margin: 0px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
