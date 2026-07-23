@@ -4,9 +4,52 @@ header {
   display: flex;
   justify-content: center;
   color: aliceblue;
+  height: 86px;
 }
 
 body {
   margin: 0px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+aside {
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  height: 100%;
+  background-color: rgb(37, 113, 128);
+  color: aliceblue;
+  min-height: calc(100vh - 86px);
+}
+
+aside button {
+  background: none;
+  height: 160px;
+
+  border: none;
+  color: aliceblue;
+  font-size: x-large;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  padding: 40px;
+}
+
+aside button:hover {
+  background-color: rgb(35, 101, 115);
+}
+
+#default-page {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  color: #292929;
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+
+}
+
+#body-elements {
+  display: flex;
 }
