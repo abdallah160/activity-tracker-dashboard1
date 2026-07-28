@@ -2,51 +2,40 @@ import { useState } from "react";
 import { activities } from "./activities";
 export default function Dashboard({ trackerData }) {
     const [avgData, setAvgData] = useState(handleOptionChange("weeks"));
+    function handleOptionChange(opt) {
+        const totals = structuredClone(activities);
+        let interval;
+        if (opt == "weeks") {
+            interval = 7;
+        }
+        else if (opt == "months") {
+            interval = 30;
+        }
+        else if (opt == "years") {
+            interval = 365;
+        }
 
-    function findPeriodValues() {
-        try {
-            let oldest = new Date(trackerData[0].date);
-            let today = new Date();
+        const dateIterator = new Date();
+        const aWeekAgo = new Date();
+        aWeekAgo.setDate(dateIterator.getDate() - interval);
+        while (dateIterator >= aWeekAgo) {
 
-            for (let item of trackerData) {
-                let currentDate = new Date(item.date);
-                if (currentDate < oldest) {
-                    oldest = currentDate;
+            for (let dataObj of trackerData) {
+                const currentDate = dateIterator.toISOString().split("T")[0];
+                if (dataObj.date === currentDate) {
+                    totals[dataObj.activity] += dataObj.hours;
                 }
             }
-            return {
-                weeks: Math.max(1, Math.ceil((today - oldest) / 86400000 / 7)),
-                months: Math.max(1, Math.ceil((today - oldest) / 86400000 / 30.5)),
-                years: Math.max(1, Math.ceil((today - oldest) / 86400000 / 365.25)),
-            };
-        } catch (err) {
-            return {
-                weeks: 0,
-                months: 0,
-                years: 0,
-            }
+            dateIterator.setDate(dateIterator.getDate() - 1);
+
         }
+        console.log(totals);
+        return totals;
 
     }
-
-    function handleOptionChange(opt) {
-        let periods = findPeriodValues(trackerData)[opt];
-        let totals = structuredClone(activities);
-
-        for (let dataObj of trackerData) {
-            totals[dataObj.activity] += dataObj.hours;
-        }
-
-        let activitiesAvgs = {};
-        for (let key in totals) {
-            activitiesAvgs[key] = Number((totals[key] / periods).toFixed(1));
-        }
-        return activitiesAvgs;
-    }
-
     return (
         <div id="activity-page">
-            <h3>Average hours spent on activites</h3>
+            <h3>Total hours spent on activites</h3>
             <div id="activity-view">
                 <div id="all-items">
                     {Object.entries(avgData).map(([key, value], index) => {
@@ -72,9 +61,9 @@ export default function Dashboard({ trackerData }) {
                     })}
                 </div>
                 <select onChange={(e) => setAvgData(handleOptionChange(e.target.value))}>
-                    <option value="weeks">per week</option>
-                    <option value="months">per month</option>
-                    <option value="years">per year</option>
+                    <option value="weeks">last week</option>
+                    <option value="months">last month</option>
+                    <option value="years">last year</option>
                 </select>
             </div>
         </div>
