@@ -1,8 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { activities } from "./activities";
-export default function Dashboard({ trackerData }) {
+import { supabase } from "./supabaseClient";
+export default function Dashboard() {
+    const [trackerData, setTrackerData] = useState([]);
     const [avgData, setAvgData] = useState(handleOptionChange("weeks"));
+    const [isLoading, setIsLoading] = useState(false);
+    useEffect(() => {
+        async function fetchData() {
+            setIsLoading(true);
+            const response = await supabase.from('tracker').select('*');
+            if (response.error) {
+                console.log(response.error)
+            }
+            else {
+                setTrackerData(response.data)
+            };
+            setIsLoading(false);
+        }
+
+        fetchData();
+
+    }, []);
+
+    useEffect(() => {
+        setAvgData(handleOptionChange("weeks"))
+
+
+    }, [trackerData])
+
     function handleOptionChange(opt) {
+        if (trackerData.length < 1) return activities;
         const totals = structuredClone(activities);
         let interval;
         if (opt == "weeks") {
@@ -29,13 +56,13 @@ export default function Dashboard({ trackerData }) {
             dateIterator.setDate(dateIterator.getDate() - 1);
 
         }
-        console.log(totals);
         return totals;
 
     }
     return (
         <div id="activity-page">
             <h3>Total hours spent on activites</h3>
+            {isLoading && <p>fetching data...</p>}
             <div id="activity-view">
                 <div id="all-items">
                     {Object.entries(avgData).map(([key, value], index) => {
