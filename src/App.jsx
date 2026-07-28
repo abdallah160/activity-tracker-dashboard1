@@ -7,29 +7,24 @@ import RecordActivity from "./RecordActivity";
 function App() {
   const [viewState, setViewState] = useState('Default');
   const [trackerData, setTrackerData] = useState([]);
-
   let viewItem;
   function handleDataSubmittion(submittedObject) {
     setTrackerData((prev) => {
       const newArr = [...prev, submittedObject]
-      console.log(newArr);
       return newArr;
     })
 
   }
-
   if (viewState == 'Default') {
     viewItem = <DefaultView />
 
   }
   else if (viewState == 'Dashboard') {
     viewItem = <Dashboard trackerData={trackerData} />
-
   }
   else {
     viewItem = <RecordActivity handleDataSubmittion={handleDataSubmittion} />
   }
-
   return (
     <>
       <Header />

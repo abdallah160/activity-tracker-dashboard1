@@ -1,48 +1,12 @@
 import { useState } from "react";
-
-const INIT_DATA = {
-    sleep: 0,
-    work: 0,
-    sport: 0,
-    reading: 0,
-    eating: 0,
-    tv: 0,
-    family: 0,
-};
-
+import { activities } from "./activities";
 export default function Dashboard({ trackerData }) {
+    const [avgData, setAvgData] = useState(handleOptionChange("weeks"));
 
-    const getInitialAvgData = () => {
-        let numOfWeeks = findPeriodValues(trackerData).weeks;
-        let totals = {
-            sleep: 0,
-            work: 0,
-            sport: 0,
-            reading: 0,
-            eating: 0,
-            tv: 0,
-            family: 0,
-        };
-        for (let dataObj of trackerData) {
-            totals[dataObj.activity] += dataObj.hours;
-        }
-
-        let activitiesAvgs = {};
-        for (let key in totals) {
-            console.log({ numOfWeeks: numOfWeeks, totalKey: totals[key] })
-            activitiesAvgs[key] = Number((totals[key] / numOfWeeks).toFixed(1));
-        }
-        console.log({ activitiesAvgs })
-        return activitiesAvgs;
-    }
-
-    const [avgData, setAvgData] = useState(getInitialAvgData());
-
-    function findPeriodValues(trackerData) {
+    function findPeriodValues() {
         try {
             let oldest = new Date(trackerData[0].date);
             let today = new Date();
-
 
             for (let item of trackerData) {
                 let currentDate = new Date(item.date);
@@ -50,11 +14,10 @@ export default function Dashboard({ trackerData }) {
                     oldest = currentDate;
                 }
             }
-
             return {
-                weeks: Math.max(1, (today - oldest) / 86400000 / 7),
-                months: Math.max(1, (today - oldest) / 86400000 / 30.5),
-                years: Math.max(1, (today - oldest) / 86400000 / 365.25),
+                weeks: Math.max(1, Math.ceil((today - oldest) / 86400000 / 7)),
+                months: Math.max(1, Math.ceil((today - oldest) / 86400000 / 30.5)),
+                years: Math.max(1, Math.ceil((today - oldest) / 86400000 / 365.25)),
             };
         } catch (err) {
             return {
@@ -67,74 +30,18 @@ export default function Dashboard({ trackerData }) {
     }
 
     function handleOptionChange(opt) {
-        if (opt == "week") {
-            setAvgData((prev) => {
-                let numOfWeeks = findPeriodValues(trackerData).weeks;
-                let totals = {
-                    sleep: 0,
-                    work: 0,
-                    sport: 0,
-                    reading: 0,
-                    eating: 0,
-                    tv: 0,
-                    family: 0,
-                };
-                for (let dataObj of trackerData) {
-                    totals[dataObj.activity] += dataObj.hours;
-                }
+        let periods = findPeriodValues(trackerData)[opt];
+        let totals = structuredClone(activities);
 
-                let activitiesAvgs = {};
-                for (let key in totals) {
-                    activitiesAvgs[key] = Number((totals[key] / numOfWeeks).toFixed(1));
-                }
-                return activitiesAvgs;
-            });
-        } else if (opt == "month") {
-            let numOfMonths = findPeriodValues(trackerData).months;
-            let totals = {
-                sleep: 0,
-                work: 0,
-                sport: 0,
-                reading: 0,
-                eating: 0,
-                tv: 0,
-                family: 0,
-            };
-            for (let dataObj of trackerData) {
-                totals[dataObj.activity] += dataObj.hours;
-            }
-
-            let activitiesAvgs = {};
-            for (let key in totals) {
-                activitiesAvgs[key] = Number((totals[key] / numOfMonths).toFixed(1));
-            }
-
-            setAvgData(activitiesAvgs);
-        } else if (opt == "year") {
-            setAvgData((prev) => {
-                let numOfYears = findPeriodValues(trackerData).years;
-                let totals = {
-                    sleep: 0,
-                    work: 0,
-                    sport: 0,
-                    reading: 0,
-                    eating: 0,
-                    tv: 0,
-                    family: 0,
-                };
-                for (let dataObj of trackerData) {
-                    totals[dataObj.activity] += dataObj.hours;
-                }
-
-                let activitiesAvgs = {};
-                for (let key in totals) {
-                    activitiesAvgs[key] = Number((totals[key] / numOfYears).toFixed(1));
-                }
-                return activitiesAvgs;
-            });
-        } else if (opt == "select") {
-            setAvgData(INIT_DATA);
+        for (let dataObj of trackerData) {
+            totals[dataObj.activity] += dataObj.hours;
         }
+
+        let activitiesAvgs = {};
+        for (let key in totals) {
+            activitiesAvgs[key] = Number((totals[key] / periods).toFixed(1));
+        }
+        return activitiesAvgs;
     }
 
     return (
@@ -164,11 +71,10 @@ export default function Dashboard({ trackerData }) {
                         );
                     })}
                 </div>
-                <select onChange={(e) => handleOptionChange(e.target.value)}>
-                    <option value="select">select</option>
-                    <option value="week">per week</option>
-                    <option value="month">per month</option>
-                    <option value="year">per year</option>
+                <select onChange={(e) => setAvgData(handleOptionChange(e.target.value))}>
+                    <option value="weeks">per week</option>
+                    <option value="months">per month</option>
+                    <option value="years">per year</option>
                 </select>
             </div>
         </div>
