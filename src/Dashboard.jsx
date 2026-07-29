@@ -19,7 +19,6 @@ export default function Dashboard() {
             finally {
                 setIsLoading(false);
             }
-            setIsLoading(false);
         }
         fetchData();
     }, []);
@@ -54,7 +53,7 @@ export default function Dashboard() {
         return totals;
     }
 
-    let max = Math.max(...Object.values(avgData), 1);
+    let max = useMemo(() => Math.max(...Object.values(avgData), 1), []);
     return (
         <div id="activity-page">
             <h3>Total hours spent on activites</h3>
